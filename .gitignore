@@ -1,0 +1,17 @@
+# sbt specific
+target/
+project/target/
+project/project/
+
+# IntelliJ IDEA specific
+.idea/
+*.iml
+*.iws
+out/
+
+# Scala specific
+*.class
+*.log
+
+# General
+.DS_Store
