@@ -44,6 +44,11 @@ object Main extends JFXApp3 {
         padding = Insets(20)
         children = Seq(
           new Label(s"Rozpoczęto grę na planszy $rows x $cols z $mines minami."),
+          GameBoard.renderBoard(
+            GameBoard.generateBoard(rows, cols, mines),
+            stage,
+            () => start()
+          ),
           new Button("Powrót do menu") {
             onAction = _ => start() // Powrót do menu głównego
           }
