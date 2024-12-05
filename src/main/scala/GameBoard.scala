@@ -27,16 +27,16 @@ object GameBoard {
       row <- board.indices
       col <- board.head.indices
     } {
-      // Tworzymy przycisk jako zmienną mutowalną
+      // button creation
       val button = new Button {
         prefWidth = 50
         prefHeight = 50
       }
 
-      // Obsługa zdarzeń myszki jest dodawana po utworzeniu przycisku
+      // mouse event handler
       button.onMouseClicked = (e: MouseEvent) => {
         e.button match {
-          case MouseButton.Primary => handleLeftClick(button, board(row)(col))
+          case MouseButton.Primary => handleLeftClick(button, board(row)(col), row, col, board)
           case MouseButton.Secondary => handleRightClick(button)
           case _ => // Ignorujemy inne przyciski
         }
@@ -48,10 +48,10 @@ object GameBoard {
     grid
   }
 
-  def handleLeftClick(button: Button, cell: Cell): Unit = {
+  def handleLeftClick(button: Button, cell: Cell, row: Int, col: Int, board: Board): Unit = {
     cell match {
       case Mine => button.text = "💣"
-      case Empty => button.text = "0"
+      case Empty => button.text = GameLogic.countAdjacentMines(board, row, col).toString
     }
   }
 
