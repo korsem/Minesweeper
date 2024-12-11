@@ -25,4 +25,28 @@ object GameLogic {
       isValidCell(board, newRow, newCol) && board(newRow)(newCol) == GameBoard.Mine
     }
   }
+
+  // TODO powinny się odsłonić jeszcze numerki wokół pustych pól !!!!1
+  def floodFill(board: GameBoard.Board, row: Int, col: Int): Seq[(Int, Int)] = {
+    // method checks which cells should be revealed after clicking on an empty cell
+    val rows = board.length
+    val cols = board.head.length
+    val visited = Array.fill(rows, cols)(false)
+    val result = scala.collection.mutable.ListBuffer[(Int, Int)]()
+
+    def dfs(r: Int, c: Int): Unit = {
+      if (isValidCell(board, r, c) && !visited(r)(c) && board(r)(c) == GameBoard.Empty && countAdjacentMines(board, r, c) == 0) {
+        visited(r)(c) = true
+        result += ((r, c))
+        for {
+          dx <- -1 to 1
+          dy <- -1 to 1
+          if !(dx == 0 && dy == 0)
+        } dfs(r + dx, c + dy)
+      }
+    }
+
+    dfs(row, col)
+    result.toSeq
+  }
 }
