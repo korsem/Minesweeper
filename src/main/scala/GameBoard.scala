@@ -67,8 +67,9 @@ object GameBoard {
           button.style = "-fx-base: lightgray"
           revealed(row)(col) = true
         } else {
-          // Use flood fill to reveal empty cells
+          // flood fill reaviling empty cells
           val cellsToReveal = GameLogic.floodFill(board, row, col)
+          // reveal empty cells with no adjeacent Mines
           cellsToReveal.foreach { case (r, c) =>
             if (!revealed(r)(c)) {
               revealed(r)(c) = true
@@ -77,6 +78,17 @@ object GameBoard {
               buttons(r)(c).style = "-fx-base: lightgray"
             }
           }
+          // reveal external cells with number of adjacent mines
+          val externalCells = GameLogic.externalCells(board, cellsToReveal)
+          externalCells.foreach { case (r, c) =>
+            if (!revealed(r)(c)) {
+              revealed(r)(c) = true
+              val adjacentMines = GameLogic.countAdjacentMines(board, r, c)
+              buttons(r)(c).text = if (adjacentMines > 0) adjacentMines.toString else ""
+              buttons(r)(c).style = "-fx-base: lightgray"
+            }
+          }
+          
         }
     }
   }

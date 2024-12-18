@@ -25,8 +25,7 @@ object GameLogic {
       isValidCell(board, newRow, newCol) && board(newRow)(newCol) == GameBoard.Mine
     }
   }
-
-  // TODO powinny się odsłonić jeszcze numerki wokół pustych pól !!!!1
+  
   def floodFill(board: GameBoard.Board, row: Int, col: Int): Seq[(Int, Int)] = {
     // method checks which cells should be revealed after clicking on an empty cell
     val rows = board.length
@@ -49,4 +48,25 @@ object GameLogic {
     dfs(row, col)
     result.toSeq
   }
+  
+  def externalCells(board: GameBoard.Board, internalCellPositions: Seq[(Int, Int)]): Seq[(Int, Int)]  = {
+    // method returns the external cells of the given internal cells
+    val result = scala.collection.mutable.ListBuffer[(Int, Int)]()
+    for {
+      (r, c) <- internalCellPositions
+      dx <- -1 to 1
+      dy <- -1 to 1
+      if !(dx == 0 && dy == 0) 
+    } {
+      val newRow = r + dx
+      val newCol = c + dy
+      
+      if (isValidCell(board, newRow, newCol) && board(newRow)(newCol) == GameBoard.Empty) {
+        result += ((newRow, newCol))
+      }
+    }
+
+    result.toSeq
+  }
+
 }
