@@ -1,8 +1,4 @@
 import scalafx.Includes.*
-// Mechanika gry:
-//Zliczanie liczby min wokół danej komórki. checked
-//Sprawdzanie warunków wygranej/przegranej.
-//Automatyczne odsłanianie pustych obszarów (tzw. flood fill).
 object GameLogic {
   def isValidCell(board: GameBoard.Board, row: Int, col: Int): Boolean = {
     // method checks if the cell is within the board
