@@ -17,6 +17,11 @@ object GameBoard {
   var loose = false
   var flagCount = 0
   var buttons: Array[Array[Button]] = _
+  private var updateFlagCount: () => Unit = () => {}
+
+  def setFlagCountUpdater(updater: () => Unit): Unit = {
+    updateFlagCount = updater
+  }
 
   def generateBoard(rows: Int, cols: Int, mines: Int): Board = {
     flagCount = mines
@@ -116,6 +121,7 @@ object GameBoard {
       flagCount -= 1
     }
 
+    updateFlagCount()
     checkWinCondition(controller, board)
   }
 
