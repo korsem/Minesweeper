@@ -1,4 +1,5 @@
 import scalafx.Includes.*
+import scalafx.scene.Scene
 import scalafx.scene.layout.GridPane
 import scalafx.scene.control.Button
 import scalafx.stage.Stage
@@ -20,7 +21,7 @@ object GameBoard {
     shuffled.grouped(cols).toVector
   }
 
-  def renderBoard(board: Board, stage: Stage, backToMenu: () => Unit): GridPane = {
+  def renderBoard(board: Board, controller: GameController): GridPane = {
     val grid = new GridPane()
     val revealed = Array.fill(board.length, board.head.length)(false)
     val buttons = Array.ofDim[Button](board.length, board.head.length)
@@ -38,7 +39,7 @@ object GameBoard {
       // mouse event handler
       button.onMouseClicked = (e: MouseEvent) => {
         e.button match {
-          case MouseButton.Primary => handleLeftClick(button, board(row)(col), row, col, board, revealed, buttons)
+          case MouseButton.Primary => handleLeftClick(button, board(row)(col), row, col, board, revealed, buttons, controller)
           case MouseButton.Secondary => handleRightClick(button)
           case _ => // Ignorujemy inne przyciski
         }
@@ -52,14 +53,29 @@ object GameBoard {
     grid
   }
 
-  def handleLeftClick(button: Button, cell: Cell, row: Int, col: Int, board: Board, revealed: Array[Array[Boolean]], buttons: Array[Array[Button]]): Unit = {
+  def handleLeftClick(button: Button, cell: Cell, row: Int, col: Int, board: Board, revealed: Array[Array[Boolean]], buttons: Array[Array[Button]], controller: GameController): Unit = {
     if (revealed(row)(col)) return // If the cell is already revealed, do nothing
 
     cell match {
       case Mine =>
         button.text = "💣"
         button.style = "-fx-base: red"
-        println("Przegrana!") // TODO: Add a game over window
+        //      // wait for 2 seconds and show the game over screen
+        //      val timeline = new Timeline {
+        //        cycleCount = 1
+        //        keyFrames = Seq(
+        //          KeyFrame(Duration(2000), _ => {
+        //            controller.getStage.scene = new Scene {
+        //              root = new GameOverMinesweeperView(controller, board.length, board.head.length, board.flatten.count(_ == Mine))
+        //            }
+        //          })
+        //        )
+        //      }
+        //      timeline.play()
+
+        controller.getStage.scene = new Scene {
+          root = new GameOverMinesweeperView(controller, board.length, board.head.length, board.flatten.count(_ == Mine))
+        }
       case Empty =>
         val numberOfAdjacentMines = GameLogic.countAdjacentMines(board, row, col)
         if (numberOfAdjacentMines > 0) {
@@ -67,9 +83,9 @@ object GameBoard {
           button.style = "-fx-base: lightgray"
           revealed(row)(col) = true
         } else {
-          // flood fill reaviling empty cells
+          // flood fill revealing empty cells
           val cellsToReveal = GameLogic.floodFill(board, row, col)
-          // reveal empty cells with no adjeacent Mines
+          // reveal empty cells with no adjacent Mines
           cellsToReveal.foreach { case (r, c) =>
             if (!revealed(r)(c)) {
               revealed(r)(c) = true
@@ -88,13 +104,15 @@ object GameBoard {
               buttons(r)(c).style = "-fx-base: lightgray"
             }
           }
-          
         }
     }
   }
 
   def handleRightClick(button: Button): Unit = {
     // trzeba jescze sprawdzić czy nie jest odkryte, bo jak jest to nie można zmienić
+    // mozna dodać licznik ile zostało jeszcze flag (tyle co min)
     button.text = if (button.text.equals("🚩")) "" else "🚩"
+    // okienko wygraleś - po nim sie wyświetla imie do wpisania i wynik,
+    // ale zanim się wyświetli to przez 2 sekundy wyświetla się odsłonięta plansza z bombami
   }
 }
