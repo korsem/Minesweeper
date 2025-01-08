@@ -18,9 +18,14 @@ object GameBoard {
   var flagCount = 0
   var buttons: Array[Array[Button]] = _
   private var updateFlagCount: () => Unit = () => {}
+  private var stopTimer: () => Int = () => 0
 
   def setFlagCountUpdater(updater: () => Unit): Unit = {
     updateFlagCount = updater
+  }
+
+  def setTimerStopper(stopper: () => Int): Unit = {
+    stopTimer = stopper
   }
 
   def generateBoard(rows: Int, cols: Int, mines: Int): Board = {
@@ -127,12 +132,13 @@ object GameBoard {
 
   def checkWinCondition(controller: GameController, board: Board): Unit = {
     if (flagCount == 0 && allMinesFlaggedCorrectly(board)) {
+      val timeTaken = stopTimer()
       val timeline = new Timeline {
         cycleCount = 1
         keyFrames = Seq(
           KeyFrame(Duration(2000), onFinished = _ => {
             controller.getStage.scene = new Scene {
-              root = new YouWonMineSweeperView(controller)
+              root = new YouWonMinesweeperView(controller, timeTaken)
             }
           })
         )
