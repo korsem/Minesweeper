@@ -16,9 +16,9 @@ class GameController(primaryStage: Stage) {
     }
   }
 
-  def startSudoku(): Unit = {
+  def startSudoku(lvl: Int): Unit = {
     stage.scene = new Scene {
-      root = new SudokuView(GameController.this)
+      root = new SudokuView(lvl, GameController.this)
     }
   }
 

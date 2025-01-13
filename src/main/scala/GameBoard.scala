@@ -46,8 +46,8 @@ object GameBoard {
       col <- board.head.indices
     } {
       val button = new Button {
-        prefWidth = 50
-        prefHeight = 50
+        prefWidth = if (board.length == 9) 50 else 37
+        prefHeight = if (board.length == 9) 50 else 38
       }
 
       button.onMouseClicked = (e: MouseEvent) => {

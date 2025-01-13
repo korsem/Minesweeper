@@ -4,11 +4,11 @@ import scalafx.scene.layout.VBox
 import scalafx.scene.control.{Button, Label}
 import scalafx.util.Duration
 
-class SudokuView(controller: GameController) extends VBox {
+class SudokuView(lvl: Int, controller: GameController) extends VBox {
   padding = Insets(20)
   spacing = 10
 
-  private val board = SudokuBoard.generateBoard()
+  private val board = SudokuBoard.generateBoard(lvl)
   private val timerLabel = new Label("Time: 0s") {
     style = "-fx-font-weight: bold"
   }

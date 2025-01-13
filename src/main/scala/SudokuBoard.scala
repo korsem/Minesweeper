@@ -13,6 +13,20 @@ object SudokuBoard {
 
     value.foreach(v => text = v.toString)
 
+    // methods to thicken borders
+    def thickenRightBorder(): Unit = {
+      style = style.value + "; -fx-border-right-width: 3;"
+    }
+    def thickenLeftBorder(): Unit = {
+      style = style.value + "; -fx-border-left-width: 3;"
+    }
+    def thickenTopBorder(): Unit = {
+      style = "-fx-font-size: 18; -fx-alignment: center; -fx-border-color: black; -fx-border-top-width: 3;"
+    }
+    def thickenBottomBorder(): Unit = {
+      style = style.value + "; -fx-border-bottom-width: 3;"
+    }
+
     this.onMouseClicked = (e: MouseEvent) => {
       e.button match {
         case MouseButton.Primary => handleLeftClick()
@@ -32,7 +46,7 @@ object SudokuBoard {
             text = "" // Clear if invalid input
           }
         }
-        style = "-fx-font-size: 14; -fx-text-fill: black;"
+        style = "-fx-font-size: 14; -fx-text-fill: black;" // nadpisywane a nie zmieniane
       }
     }
 
@@ -53,7 +67,7 @@ object SudokuBoard {
     }
 
     private def highlightRowAndColumn(gridPane: javafx.scene.layout.GridPane): Unit = {
-      
+
       // something wrong with types - Cannot invoke "SudokuBoard$Cell.style()" because "rowCell" is null
       for (i <- 0 until 9) {
         val rowCell = gridPane.lookup(s"#cell-$row-$i").asInstanceOf[Cell]
@@ -66,8 +80,6 @@ object SudokuBoard {
   }
 
   type Board = Vector[Vector[Option[Int]]]
-  
-  // wywolane validBoard - def boardFill()
 
   private var stopTimer: () => Int = () => 0
 
@@ -77,12 +89,12 @@ object SudokuBoard {
     stopTimer = stopper
   }
 
-  def generateBoard(): Board = {
+  def generateBoard(lvl: Int): Board = {
+    // lvl == 1 => połowa pusta, lvl == 2 => 2/3 pustych, lvl == 3 => 3/4 pustych
     // generate play board based on validBoard - consisting of cells not int wioth some empty cells (to fill for the player)
     // it should be done so it is possible to solve the board and there is only 1 way to solve it
     // I may create a method to check if the board is solvable in GameLogic
     validBoard.map(row => row.map(Some(_)))
-    
   }
 
   def renderBoard(board: Board, controller: GameController): GridPane = {
@@ -93,12 +105,12 @@ object SudokuBoard {
       gridPane.add(cell, col, row)
 
       val borderStyle = new StringBuilder()
-      
-      // 3x3 subgrid borders: thicker every 3 rows and columns
-//      borderStyle.append("-fx-border-right-width: 1; -fx-border-right-color: black;")
-//      borderStyle.append("-fx-border-bottom-width: 1; -fx-border-bottom-color: black;")
 
-      cell.style = cell.style.value + borderStyle.toString()
+      // 3x3 subgrid borders: thicker every 3 rows and columns
+      // - doesnt work
+      if (row % 3 == 0) {
+        cell.thickenTopBorder()
+      }
     }
 
     gridPane

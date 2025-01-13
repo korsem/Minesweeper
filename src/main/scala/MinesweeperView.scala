@@ -29,7 +29,6 @@ class MinesweeperView(rows: Int, cols: Int, mines: Int, controller: GameControll
   
 
   children = Seq(
-    new Label(s"Saper: Rozmiar planszy $rows x $cols, Liczba min: $mines"),
     timerLabel,
     flagCountLabel,
     GameBoard.renderBoard(board, controller),
