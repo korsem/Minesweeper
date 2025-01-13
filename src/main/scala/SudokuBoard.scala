@@ -5,17 +5,11 @@ import scalafx.scene.paint.Color
 import scalafx.Includes.*
 
 object SudokuBoard {
-  // current step - drawing the board
-
   case class Cell(value: Option[Int], row: Int, col: Int, controller: GameController, isEditable: Boolean = true) extends TextField {
-    // other characters than max 1 to 9 are not allowed
     prefWidth = 50
     prefHeight = 50
-    style = "-fx-font-size: 18; -fx-alignment: center;"
+    style = "-fx-font-size: 18; -fx-alignment: center; -fx-border-color: black; -fx-border-width: 1;"
     editable = isEditable
-
-    // TODO: not editable cells should have bold font
-    // TODO: handle the situation when user wants to add more than 1 number
 
     value.foreach(v => text = v.toString)
 
@@ -26,10 +20,10 @@ object SudokuBoard {
         case MouseButton.Secondary => handleRightClick()
         case _ => // Ignore other mouse buttons
       }
+// not workiung -     highlightRowAndColumn(parent.value.asInstanceOf[javafx.scene.layout.GridPane])
     }
 
     def handleLeftClick(): Unit = {
-      // input a number taken into account in solution
       if (isEditable) {
         text = ""
         requestFocus()
@@ -38,6 +32,7 @@ object SudokuBoard {
             text = "" // Clear if invalid input
           }
         }
+        style = "-fx-font-size: 14; -fx-text-fill: black;"
       }
     }
 
@@ -56,24 +51,41 @@ object SudokuBoard {
         style = "-fx-font-size: 14; -fx-text-fill: gray;"
       }
     }
+
+    private def highlightRowAndColumn(gridPane: javafx.scene.layout.GridPane): Unit = {
+      
+      // something wrong with types - Cannot invoke "SudokuBoard$Cell.style()" because "rowCell" is null
+      for (i <- 0 until 9) {
+        val rowCell = gridPane.lookup(s"#cell-$row-$i").asInstanceOf[Cell]
+        val colCell = gridPane.lookup(s"#cell-$i-$col").asInstanceOf[Cell]
+
+        rowCell.style = rowCell.style.value + "; -fx-background-color: lightyellow;"
+        colCell.style = colCell.style.value + "; -fx-background-color: lightyellow;"
+      }
+    }
   }
 
   type Board = Vector[Vector[Option[Int]]]
+  
+  // wywolane validBoard - def boardFill()
 
   private var stopTimer: () => Int = () => 0
+
+  val validBoard: Vector[Vector[Int]] = SudokuLogic.generateValidBoard()
 
   def setTimerStopper(stopper: () => Int): Unit = {
     stopTimer = stopper
   }
 
   def generateBoard(): Board = {
-    // TODO: generate a valid sudoku board => add the logic later
-    Vector.fill(9, 9)(None)
+    // generate play board based on validBoard - consisting of cells not int wioth some empty cells (to fill for the player)
+    // it should be done so it is possible to solve the board and there is only 1 way to solve it
+    // I may create a method to check if the board is solvable in GameLogic
+    validBoard.map(row => row.map(Some(_)))
+    
   }
 
   def renderBoard(board: Board, controller: GameController): GridPane = {
-    // sudoku board consisation of 9x9 cells
-    // i want the border to be thicker every 3 cells
     val gridPane = new GridPane()
 
     for (row <- 0 until 9; col <- 0 until 9) {
@@ -81,21 +93,14 @@ object SudokuBoard {
       gridPane.add(cell, col, row)
 
       val borderStyle = new StringBuilder()
-      if (col % 3 == 2 && col != 8) {
-        borderStyle.append("-fx-border-right-width: 2; -fx-border-right-color: black;")
-      }
-      if (row % 3 == 2 && row != 8) {
-        borderStyle.append("-fx-border-bottom-width: 2; -fx-border-bottom-color: black;")
-      }
+      
+      // 3x3 subgrid borders: thicker every 3 rows and columns
+//      borderStyle.append("-fx-border-right-width: 1; -fx-border-right-color: black;")
+//      borderStyle.append("-fx-border-bottom-width: 1; -fx-border-bottom-color: black;")
+
       cell.style = cell.style.value + borderStyle.toString()
     }
 
     gridPane
   }
 }
-
-// TODO:
-// logic - next step filling valid numbers which cannot be changed
-// the board is generated randomly
-// the board is solvable
-// the board has only one solution
