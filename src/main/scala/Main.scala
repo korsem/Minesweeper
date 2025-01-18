@@ -7,6 +7,7 @@ object Main extends JFXApp3 {
       title = "Game Menu"
       minWidth = 9 * 50 + 40
       minHeight = 9 * 50 + 80
+      resizable = false
     }
 
     val controller = new GameController(stage)
