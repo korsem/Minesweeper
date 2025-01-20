@@ -15,7 +15,7 @@ object SudokuBoard {
 
     value.foreach(v => text = v.toString)
     id = s"cell-$row-$col" // Set the unique id for each cell
-    
+
     def changeBackgroundColor(color: String): Unit = {
       style = style.value + s"; -fx-background-color: $color;"
     }
@@ -45,22 +45,26 @@ object SudokuBoard {
       }
     }
 
+    // nie działa jeśli zaczne od razu wpisywać liczbę
     def handleLeftClick(): Unit = {
       if (isEditable) {
-        text = ""
         requestFocus()
-        text.onChange { (_, _, newValue) =>
-          if (!newValue.matches("[1-9]?")) {
-            text = "" // Clear if invalid input
+        text.onChange { (_, oldValue, newValue) =>
+          if (newValue.matches("[1-9]?")) {
+            val intValue = if (newValue.isEmpty) 0 else newValue.toInt
+            SudokuBoard.userBoard = SudokuBoard.userBoard.updated(row, SudokuBoard.userBoard(row).updated(col, intValue))
+          } else {
+            println("Invalid input")
           }
         }
         style = "-fx-font-size: 14; -fx-text-fill: darkblue;"
       }
     }
 
-    private def handleMiddleClick(): Unit = {
+    def handleMiddleClick(): Unit = {
       if (isEditable) {
         text = ""
+        SudokuBoard.userBoard = SudokuBoard.userBoard.updated(row, SudokuBoard.userBoard(row).updated(col, 0))
       }
     }
 
@@ -68,6 +72,7 @@ object SudokuBoard {
       if (isEditable) {
         text = ""
         style = "-fx-font-size: 14; -fx-text-fill: gray;"
+        SudokuBoard.userBoard = SudokuBoard.userBoard.updated(row, SudokuBoard.userBoard(row).updated(col, 0))
       }
     }
   }
@@ -81,7 +86,6 @@ object SudokuBoard {
       }
     }
   }
-  
 
   private var stopTimer: () => Int = () => 0
 
@@ -89,21 +93,22 @@ object SudokuBoard {
     stopTimer = stopper
   }
 
-  // valid Board and its equivalent initial board
+  // valid Board and its equivalent initial board, but all the value are filled
   private val validBoard: Vector[Vector[Int]] = SudokuLogic.generateValidBoard()
   private var initialBoard: Vector[Vector[Int]] = _ // validBoard but with 0 values where empty cells after generating board
+  var userBoard: Vector[Vector[Int]] = _ // user's board
 
   def generateBoard(lvl: Int, controller: GameController): Board = {
     val random = new Random()
     val filledCells = lvl match {
-      case 1 => 80 // Easy: 70 cells filled
+      case 1 => 70 // Easy: 70 cells filled
       case 2 => 38 // Medium: 38 cells filled
       case 3 => 25 // Hard: 25 cells filled
     }
 
-    var board = validBoard.map(_.map(Option(_))) // Convert to Vector[Vector[Option[Int]]]
+    var board = validBoard.map(_.map(Option(_))) // convert to Vector[Vector[Option[Int]]]
 
-    // generate a new board by removing cells
+    // Generate a new board by removing cells
     for (_ <- 0 until (81 - filledCells)) {
       var row = 0
       var col = 0
@@ -114,19 +119,23 @@ object SudokuBoard {
       board = board.updated(row, board(row).updated(col, None))
     }
 
+    // store the initial state of the board, if None store as 0
     initialBoard = validBoard.zipWithIndex.map { case (row, rowIndex) =>
       row.zipWithIndex.map { case (value, colIndex) =>
         if (board(rowIndex)(colIndex).isEmpty) 0 else value
       }
     }
+    // the current board state
+    userBoard = initialBoard.map(_.map(identity))
 
     convertToBoard(board.map(_.map(_.getOrElse(0))), controller)
   }
 
-  def boardToInitial(board:Board, controller: GameController): Board = {
+  def boardToInitial(board: Board, controller: GameController): Board = {
     convertToBoard(initialBoard, controller)
   }
-  def boardToValid(board:Board, controller: GameController): Board = {
+
+  def boardToValid(board: Board, controller: GameController): Board = {
     convertToBoard(validBoard, controller)
   }
 
@@ -154,15 +163,17 @@ object SudokuBoard {
     gridPane
   }
 
-  def checkUserBoard(userBoard: Board): Seq[(Int, Int)] = {
+  def checkUserBoard(): Seq[(Int, Int)] = {
     // Check if the user board is correct, return incorrect cells, or empty if correct
     val incorrectCells = for {
       row <- 0 until 9
       col <- 0 until 9
-      if userBoard(row)(col).value.getOrElse(0) != validBoard(row)(col)
+      if {
+        println(s"Checking cell ($row, $col): userBoard=${userBoard(row)(col)}, validBoard=${validBoard(row)(col)}")
+        userBoard(row)(col) != validBoard(row)(col)
+      }
     } yield (row, col)
 
     incorrectCells
   }
 }
-

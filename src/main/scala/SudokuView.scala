@@ -38,9 +38,8 @@ class SudokuView(lvl: Int, controller: GameController) extends VBox {
     },
     new Button("Sprawdź rozwiązanie") {
       onAction = _ => {
-        val incorrectCells = SudokuBoard.checkUserBoard(board)
+        val incorrectCells = SudokuBoard.checkUserBoard()
         if (incorrectCells.isEmpty) {
-          print("You won!")
           showSolution()
           val timeTaken = stopTimer()
           val timeline = new Timeline {
@@ -55,7 +54,6 @@ class SudokuView(lvl: Int, controller: GameController) extends VBox {
           }
           timeline.play()
         } else {
-          print("You lost!")
           // highlightIncorrectCells(incorrectCells) doesnt work
           val timeline = new Timeline {
             cycleCount = 1
