@@ -58,16 +58,13 @@ object SudokuBoard {
       }
     }
 
-    def handleMiddleClick(): Unit = {
-      // used to clear the text
+    private def handleMiddleClick(): Unit = {
       if (isEditable) {
         text = ""
       }
     }
 
     def handleRightClick(): Unit = {
-      // to add a number which is not taken into account in the solution,
-      // and is cleared with a left click as well as the middle click
       if (isEditable) {
         text = ""
         style = "-fx-font-size: 14; -fx-text-fill: gray;"
@@ -77,48 +74,60 @@ object SudokuBoard {
 
   type Board = Vector[Vector[Cell]]
 
+  private def convertToBoard(intBoard: Vector[Vector[Int]], controller: GameController): Board = {
+    intBoard.zipWithIndex.map { case (row, rowIndex) =>
+      row.zipWithIndex.map { case (value, colIndex) =>
+        Cell(if (value == 0) None else Some(value), rowIndex, colIndex, controller, value == 0)
+      }
+    }
+  }
+  
+
   private var stopTimer: () => Int = () => 0
 
   def setTimerStopper(stopper: () => Int): Unit = {
     stopTimer = stopper
   }
 
-  val validBoard: Vector[Vector[Int]] = SudokuLogic.generateValidBoard()
+  // valid Board and its equivalent initial board
+  private val validBoard: Vector[Vector[Int]] = SudokuLogic.generateValidBoard()
+  private var initialBoard: Vector[Vector[Int]] = _ // validBoard but with 0 values where empty cells after generating board
 
-  def generateBoard(lvl: Int, controller: GameController, initial: Boolean): Board = {
+  def generateBoard(lvl: Int, controller: GameController): Board = {
     val random = new Random()
     val filledCells = lvl match {
-      case 1 => 70 // Easy: 70 cells filled
+      case 1 => 80 // Easy: 70 cells filled
       case 2 => 38 // Medium: 38 cells filled
       case 3 => 25 // Hard: 25 cells filled
     }
 
-    var board = validBoard.map(_.map(Option(_)))
+    var board = validBoard.map(_.map(Option(_))) // Convert to Vector[Vector[Option[Int]]]
 
-    if (initial) {
-      // Reset the existing board by clearing user-editable cells
-      board = board.map(row => row.map {
-        case Some(value) if value != 0 => Some(value)
-        case _ => None
-      })
-    } else {
-      // Generate a new board by removing cells
-      for (_ <- 0 until (81 - filledCells)) {
-        var row = 0
-        var col = 0
-        while (board(row)(col).isEmpty) {
-          row = random.nextInt(9)
-          col = random.nextInt(9)
-        }
-        board = board.updated(row, board(row).updated(col, None))
+    // generate a new board by removing cells
+    for (_ <- 0 until (81 - filledCells)) {
+      var row = 0
+      var col = 0
+      while (board(row)(col).isEmpty) {
+        row = random.nextInt(9)
+        col = random.nextInt(9)
       }
+      board = board.updated(row, board(row).updated(col, None))
     }
 
-    board.zipWithIndex.map { case (row, rowIndex) =>
+    initialBoard = validBoard.zipWithIndex.map { case (row, rowIndex) =>
       row.zipWithIndex.map { case (value, colIndex) =>
-        Cell(value, rowIndex, colIndex, controller, value.isEmpty)
+        if (board(rowIndex)(colIndex).isEmpty) 0 else value
       }
     }
+
+    convertToBoard(board.map(_.map(_.getOrElse(0))), controller)
+  }
+
+  def boardToInitial(board:Board, controller: GameController): Board = {
+    convertToBoard(initialBoard, controller)
+  }
+  def boardToValid(board:Board, controller: GameController): Board = {
+    convertToBoard(validBoard, controller)
   }
 
   def renderBoard(board: Board, controller: GameController): GridPane = {
@@ -144,19 +153,16 @@ object SudokuBoard {
 
     gridPane
   }
-  
-def checkUserBoard(userBoard: Board): Seq[(Int, Int)] = {
-  // Check if the user board is correct, return incorrect cells, or empty if correct
-  // prztyrównaj do valid board, chce jeszcze printowac te wartości w celu znalezienia błędu
-  print(userBoard)
-  validBoard.zip(userBoard).zipWithIndex.flatMap { case ((validRow, userRow), row) =>
-    validRow.zip(userRow).zipWithIndex.flatMap { case ((validValue, userCell), col) =>
-      if (userCell.value.contains(validValue)) {
-        None
-      } else {
-        Some((row, col))
-      }
-    }
+
+  def checkUserBoard(userBoard: Board): Seq[(Int, Int)] = {
+    // Check if the user board is correct, return incorrect cells, or empty if correct
+    val incorrectCells = for {
+      row <- 0 until 9
+      col <- 0 until 9
+      if userBoard(row)(col).value.getOrElse(0) != validBoard(row)(col)
+    } yield (row, col)
+
+    incorrectCells
   }
 }
-}
+
