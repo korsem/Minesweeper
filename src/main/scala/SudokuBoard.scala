@@ -17,23 +17,7 @@ object SudokuBoard {
     id = s"cell-$row-$col" // Set the unique id for each cell
 
     def changeBackgroundColor(color: String): Unit = {
-      style = style.value + s"; -fx-background-color: $color;"
-    }
-
-    def thickenRightBorder(): Unit = {
-      style = style.value + "; -fx-border-right-width: 3;"
-    }
-
-    def thickenLeftBorder(): Unit = {
-      style = style.value + "; -fx-border-left-width: 3;"
-    }
-
-    def thickenTopBorder(): Unit = {
-      style = style.value + "; -fx-border-top-width: 3;"
-    }
-
-    def thickenBottomBorder(): Unit = {
-      style = style.value + "; -fx-border-bottom-width: 3;"
+      style = style.value + s" -fx-background-color: $color;"
     }
 
     this.onMouseClicked = (e: MouseEvent) => {
@@ -41,7 +25,7 @@ object SudokuBoard {
         case MouseButton.Primary => handleLeftClick()
         case MouseButton.Middle => handleMiddleClick()
         case MouseButton.Secondary => handleRightClick()
-        case _ => // Ignore other mouse buttons
+        case _ => 
       }
     }
 
@@ -108,7 +92,7 @@ object SudokuBoard {
 
     var board = validBoard.map(_.map(Option(_))) // convert to Vector[Vector[Option[Int]]]
 
-    // Generate a new board by removing cells
+    // a new board by removing cells
     for (_ <- 0 until (81 - filledCells)) {
       var row = 0
       var col = 0
@@ -144,20 +128,14 @@ object SudokuBoard {
 
     for (row <- 0 until 9; col <- 0 until 9) {
       val cell = board(row)(col)
-      gridPane.add(cell, col, row)
 
-      if (row % 3 == 0) {
-        cell.thickenTopBorder()
-      }
-      if (col % 3 == 0) {
-        cell.thickenLeftBorder()
-      }
-      if ((row + 1) % 3 == 0) {
-        cell.thickenBottomBorder()
-      }
-      if ((col + 1) % 3 == 0) {
-        cell.thickenRightBorder()
-      }
+      // colors to differentiate 3x3 subgrids
+      val isLightYellow = (row / 3 + col / 3) % 2 == 0
+      val backgroundColor = if (isLightYellow) "#FFFFE0" else "#FFDAB9" 
+
+      cell.changeBackgroundColor(backgroundColor)
+      print(cell.style)
+      gridPane.add(cell, col, row)
     }
 
     gridPane

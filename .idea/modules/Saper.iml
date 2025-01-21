@@ -30,5 +30,8 @@
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.14:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala3-library_3:3.3.4:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scalafx:scalafx_3:22.0.0-R33:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.slf4j:slf4j-api:2.0.13:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.slf4j:slf4j-simple:2.0.13:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.xerial:sqlite-jdbc:3.46.0.0:jar" level="project" />
   </component>
 </module>

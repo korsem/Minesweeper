@@ -54,7 +54,7 @@ object GameBoard {
         e.button match {
           case MouseButton.Primary => handleLeftClick(button, board(row)(col), row, col, board, revealed, buttons, controller)
           case MouseButton.Secondary => handleRightClick(button, revealed(row)(col), board, controller)
-          case _ => // Ignore other buttons
+          case _ => 
         }
       }
 
@@ -133,12 +133,17 @@ object GameBoard {
   def checkWinCondition(controller: GameController, board: Board): Unit = {
     if (flagCount == 0 && allMinesFlaggedCorrectly(board)) {
       val timeTaken = stopTimer()
+      val lvl = board.length match {
+        case 9 => 1
+        case 13 => 2
+        case _ => 3
+      }
       val timeline = new Timeline {
         cycleCount = 1
         keyFrames = Seq(
           KeyFrame(Duration(2000), onFinished = _ => {
             controller.getStage.scene = new Scene {
-              root = new YouWonMinesweeperView(controller, timeTaken)
+              root = new YouWonMinesweeperView(controller, timeTaken, lvl)
             }
           })
         )

@@ -3,6 +3,8 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "3.3.4"
 
 libraryDependencies += "org.scalafx" %% "scalafx" % "22.0.0-R33"
+libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.46.0.0"
+libraryDependencies += "org.slf4j" % "slf4j-simple" % "2.0.13"
 libraryDependencies ++= {
   // Determine OS version of JavaFX binaries
   lazy val osName = System.getProperty("os.name") match {

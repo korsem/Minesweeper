@@ -15,3 +15,6 @@ out/
 
 # General
 .DS_Store
+
+# database
+game_scores.db

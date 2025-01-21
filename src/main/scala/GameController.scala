@@ -22,6 +22,12 @@ class GameController(primaryStage: Stage) {
     }
   }
 
+  def showRanking(game: String, level: String): Unit = {
+    stage.scene = new Scene {
+      root = new RankingView(GameController.this, game, level)
+    }
+  }
+
   def returnToMenu(): Unit = showMainMenu()
 
   def getStage: Stage = stage
