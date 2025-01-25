@@ -93,6 +93,7 @@ class SudokuView(lvl: Int, controller: GameController) extends VBox {
   }
 
   private def highlightIncorrectCells(incorrectCells: Seq[(Int, Int)]): Unit = {
+    // todo - można w przyszłości naprawić tą metodę, obecnie nie jest używana
     incorrectCells.foreach { case (row, col) =>
       val cell = gridPane.lookup(s"#cell-$row-$col").asInstanceOf[SudokuBoard.Cell]
       if (cell != null) {

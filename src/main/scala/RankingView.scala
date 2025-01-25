@@ -7,7 +7,7 @@ class RankingView(controller: GameController, game: String, level: String) exten
   padding = Insets(50)
 
   val scores = Database.getScores(game, level)
-
+  // wyświetlanie list powinno być posortowane rosnąco po czasie
   children = Seq(
     new Label(s"Ranking $game - $level") {
       style = "-fx-font-size: 24px; -fx-font-weight: bold;"

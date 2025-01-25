@@ -3,6 +3,7 @@ import scalafx.scene.Scene
 
 class GameController(primaryStage: Stage) {
   private val stage = primaryStage
+  // GameController jest odpowiedzialny za zarządzanie widokami
 
   def showMainMenu(): Unit = {
     stage.scene = new Scene {

@@ -1,5 +1,2 @@
-### Minesweeper
-
-Minesweeper Project is made in Scala for Functional Programming course.
-
-### How to run on different systems ?
+### Minesweeper / Sudoku
+### Simple implementation of two classic games - Minesweeper and Sudoku, written in Scala, using ScalaFX.

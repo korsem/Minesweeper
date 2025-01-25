@@ -1,11 +1,14 @@
 import java.sql.{Connection, DriverManager, ResultSet}
 
 object Database {
+  // Database.scala jest odpowiedzialne za obsługę bazy danych SQLite, w której przechowywane są wyniki gier.
   val url = "jdbc:sqlite:game_scores.db"
 
   def connect(): Connection = DriverManager.getConnection(url)
+  // Metoda connect() tworzy połączenie z bazą danych SQLite
 
   def initialize(): Unit = {
+    // Metoda initialize() tworzy tabelę scores w bazie danych, jeśli nie istnieje.
     val connection = connect()
     val statement = connection.createStatement()
     statement.execute(
@@ -22,6 +25,8 @@ object Database {
     connection.close()
   }
 
+  // Metoda saveScore() zapisuje wynik gry w bazie danych.
+  // wynik się zapisuję dla danej gry, poziomu trudności, nazwy gracza i czasu gry.
   def saveScore(game: String, level:String, name: String, time: Int): Unit = {
     val connection = connect()
     val statement = connection.prepareStatement("INSERT INTO scores (game, level, name, time) VALUES (?, ?, ?, ?)")
@@ -34,6 +39,7 @@ object Database {
     connection.close()
   }
 
+  // Metoda getScores() pobiera wyniki gry z bazy danych.
   def getScores(game: String, level: String): Seq[(String, Int)] = {
     val connection = connect()
     val statement = connection.prepareStatement(

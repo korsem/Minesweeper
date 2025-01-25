@@ -3,7 +3,6 @@ import scalafx.util.Duration
 import scalafx.scene.Scene
 import scalafx.scene.layout.GridPane
 import scalafx.scene.control.Button
-import scalafx.stage.Stage
 import scalafx.scene.input.{MouseButton, MouseEvent}
 import scalafx.Includes.*
 
@@ -28,6 +27,7 @@ object GameBoard {
     stopTimer = stopper
   }
 
+  // tworzy planszę o podanych wymiarach i ilości min
   def generateBoard(rows: Int, cols: Int, mines: Int): Board = {
     flagCount = mines
     val emptyCells = Vector.fill(rows * cols - mines)(Empty)
@@ -36,6 +36,7 @@ object GameBoard {
     shuffled.grouped(cols).toVector
   }
 
+  // renderuje planszę na podstawie planszy gry
   def renderBoard(board: Board, controller: GameController): GridPane = {
     val grid = new GridPane()
     val revealed = Array.fill(board.length, board.head.length)(false)
@@ -65,6 +66,7 @@ object GameBoard {
     grid
   }
 
+  // obsługa lewego kliknięcia mytszy obejmuje sprawdzenia warunku wygranej / przegranej gry.
   def handleLeftClick(button: Button, cell: Cell, row: Int, col: Int, board: Board, revealed: Array[Array[Boolean]], buttons: Array[Array[Button]], controller: GameController): Unit = {
     if (revealed(row)(col)) return
 
@@ -115,6 +117,7 @@ object GameBoard {
     }
   }
 
+  // obsługa prawego kliknięcia myszy jest odpowiedzialna za pojawianie się flagi
   def handleRightClick(button: Button, isRevealed: Boolean, board: Board, controller: GameController): Unit = {
     if (isRevealed) return
 
@@ -130,6 +133,7 @@ object GameBoard {
     checkWinCondition(controller, board)
   }
 
+  // warunek wygranej gracza następuje gdy wszystkie miny są oznaczone flagami
   def checkWinCondition(controller: GameController, board: Board): Unit = {
     if (flagCount == 0 && allMinesFlaggedCorrectly(board)) {
       val timeTaken = stopTimer()
@@ -152,6 +156,7 @@ object GameBoard {
     }
   }
 
+  // miny sa poprawnie oznaczone flagą jeśli na danej pozycji, gdzie znajduje sie mina jest flaga
   def allMinesFlaggedCorrectly(board: Board): Boolean = {
     for {
       row <- board.indices

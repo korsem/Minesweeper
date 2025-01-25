@@ -29,7 +29,7 @@ object SudokuBoard {
       }
     }
 
-    // nie działa jeśli zaczne od razu wpisywać liczbę
+    // nie działa jeśli zaczne od razu wpisywać liczbę w lewym górnym rogu
     def handleLeftClick(): Unit = {
       if (isEditable) {
         requestFocus()
